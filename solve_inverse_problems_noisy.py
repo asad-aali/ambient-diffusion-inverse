@@ -212,7 +212,7 @@ def main(with_wandb, network_loc, training_options_loc, outdir, subdirs, seeds, 
     num_batches = ((len(seeds) - 1) // (max_batch_size * dist.get_world_size()) + 1) * dist.get_world_size()
 
     # Loading operator
-    operator = get_operator(corruption_pattern, corruption_probability=operator_corruption_probability, delta_probability=0.0, downsampling_factor=downsampling_factor, 
+    operator = get_operator(corruption_pattern, corruption_probability=1, delta_probability=0.0, downsampling_factor=downsampling_factor, 
         blur_type=blur_type, kernel_size=kernel_size, kernel_std=kernel_std, num_measurements=num_measurements)
 
     # Loading dataset with reference images
@@ -327,8 +327,8 @@ def main(with_wandb, network_loc, training_options_loc, outdir, subdirs, seeds, 
 
                     # load images from dataset
                     ref_images = next(train_dataloader)[0][:, :3].to(device)
-                    # corrupted_images, operator_params = operator.corrupt(ref_images + operator_corruption_probability*torch.randn_like(ref_images))
-                    corrupted_images, operator_params = operator.corrupt(ref_images)
+                    corrupted_images, operator_params = operator.corrupt(ref_images + 0.05*torch.randn_like(ref_images))
+                    # corrupted_images, operator_params = operator.corrupt(ref_images)
                     curr_seed = batch_seeds[0]
                     os.makedirs(os.path.join(outdir, str(checkpoint_number)), exist_ok=True)
                     try:
